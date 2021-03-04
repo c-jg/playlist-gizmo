@@ -1,3 +1,8 @@
 /venv
 /.vscode
-client_secret_878415284437-60ecmb8m6ippfhqkgrnnt4ifgndhcf3e.apps.googleusercontent.com.json
+TODO.txt
+.DS_store
+WL.html
+WL.csv
+client_secrets.json
+__pycache__
