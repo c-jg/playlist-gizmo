@@ -12,7 +12,7 @@ def use_local_file(FLAGS):
         "URL": []
     }
 
-    file_name = FLAGS.local_file
+    file_name = FLAGS.local_wl 
     html = soup(open(file_name), "html.parser")
     videos = html.find_all("a", {"id":"video-title"})
 

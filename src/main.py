@@ -1,19 +1,24 @@
-import pandas as pd
 import argparse
 import os
 import sys
+
+import pandas as pd
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
 
-from get_videos import get_videos
+from playlist import Playlist
 from watch_later_html import use_local_file
 from create_playlist import create_playlist
-from add_to_playlist import add_to_playlist
 
 
 def save_data(data):
+    '''
+    Handles output of data dictionary by converting to dataframe and
+    either printing or saving to .csv file.
+    '''
+
     df = pd.DataFrame(data)
     num_vids = len(df.index)
 
@@ -25,20 +30,15 @@ def save_data(data):
         print(f"Saved playlist data ({num_vids} videos) =====> " + FLAGS.save_path)
 
 
-def main():
-    scopes = [
-        "https://www.googleapis.com/auth/youtube"
-    ]
+def build_youtube(auth):
+    '''
+    Connects to YouTube Data API.
 
-    # create empty dict to store data
-    data = {
-        "Title": [],
-        "Channel": [],
-        "URL": [],
-        "Published At": [],
-        "Thumbnail": []
-    }
-    
+    Uses OAuth 2.0 if `auth` is set to True.
+    '''
+
+    scopes = ["https://www.googleapis.com/auth/youtube"]
+
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -46,18 +46,8 @@ def main():
     # variables for YouTube API
     api_service_name = "youtube"
     api_version = "v3"
-    
-    if FLAGS.public:
-        # Build using only API key
-        # No user authentication
-        DEVELOPER_KEY = os.environ.get("YT_DEV_KEY")
 
-        youtube = googleapiclient.discovery.build(
-            api_service_name, api_version, developerKey=DEVELOPER_KEY)
-    elif FLAGS.local_file:
-        save_data(use_local_file(FLAGS=FLAGS))
-    else:
-        # Get credentials and create an API client
+    if auth:
         client_secrets_file = "client_secrets.json"
 
         flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
@@ -66,6 +56,31 @@ def main():
 
         youtube = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
+    else:
+        DEVELOPER_KEY = os.environ.get("YT_DEV_KEY")
+
+        youtube = googleapiclient.discovery.build(
+            api_service_name, api_version, developerKey=DEVELOPER_KEY)
+    
+    return youtube 
+
+
+def main():
+
+    if FLAGS.local_wl:
+        # export or print Watch Later playlist from local HTML file 
+        return save_data(use_local_file(FLAGS=FLAGS))
+    
+    if FLAGS.public:
+        # Build using only API key - no user authentication
+        youtube = build_youtube(auth=False)
+    else:
+        # Get credentials and set up API
+        youtube = build_youtube(auth=True)
+
+    if FLAGS.move:
+        origin = Playlist()
+        destination = Playlist()
 
     if FLAGS.create_playlist:
         # create new playlist 
@@ -73,8 +88,9 @@ def main():
 
     if FLAGS.export_videos:
         # get data on each video in playlist
-        playlist_url = FLAGS.export_videos.split('playlist?list=')[-1]
-        save_data(get_videos(youtube=youtube, data=data, playlistId=playlist_url))
+        playlist_id = FLAGS.export_videos.split('playlist?list=')[-1]
+        exp_playlist = Playlist(playlist_id=playlist_id, youtube=youtube)
+        save_data(data=exp_playlist.export_videos())
 
 
 if __name__ == '__main__':
@@ -103,7 +119,7 @@ if __name__ == '__main__':
         help='File to save the playlist data to.'
     )
     parser.add_argument(
-        '--local_file',
+        '--local_wl',
         type=str,
         help='HTML file of Watch Later playlist.'
     )
@@ -123,7 +139,20 @@ if __name__ == '__main__':
         default=False,
         help="Disables user authentication. Only for exporting/printing public playlists"
     )
+    parser.add_argument(
+        '--move',
+        type=str,
+        help='Playlist ID of playlist to transfer.'
+    )
+    parser.add_argument(
+        '--to',
+        type=str,
+        help='Playlist ID of desired destination.'
+    )
 
     FLAGS, unparsed = parser.parse_known_args()
-    main()
+    if len(sys.argv) > 1:
+        main()
+    else:
+        print("No arguments entered.")
     
