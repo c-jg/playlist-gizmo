@@ -1,6 +1,6 @@
 class Playlist:
     def __init__(self, playlist_id, youtube):
-        self.playlist_id = playlist_id
+        self.playlist_id = playlist_id.split('playlist?list=')[-1]
         self.youtube = youtube
         self.data = {
             "Title": [],
@@ -12,16 +12,15 @@ class Playlist:
         self.videos_added = 0
 
 
-    def fetch_videos(self, playlist_id, token=None):
+    def fetch_videos(self, token=None):
         '''
         Fetches all video data from a playlist using YouTube Data API.
         Saves title, channel, url, date published, and thumbnail urls for each video.
         '''
-        youtube = self.youtube
 
-        request = youtube.playlistItems().list(
+        request = self.youtube.playlistItems().list(
             part="snippet",
-            playlistId=playlist_id,
+            playlistId=self.playlist_id,
             maxResults=50,
             pageToken=token
         )
@@ -44,8 +43,7 @@ class Playlist:
                 self.data["Thumbnail"].append(None)
 
         if "nextPageToken" in response:
-            return self.fetch_videos(playlist_id=playlist_id, 
-                token=response["nextPageToken"])
+            return self.fetch_videos(token=response["nextPageToken"])
 
         return self.data
 
@@ -60,21 +58,19 @@ class Playlist:
             print("Success")
 
 
-    def add_videos(self, playlist_id, videos):
+    def add_videos(self, videos):
         '''
         Adds YouTube video(s) to a playlist.
 
         Args:
-            youtube: YouTube API build.
-            playlist_id: Playlist ID to add videos to.
             videos: List of video IDs.
         '''
         
-        batch = youtube.new_batch_http_request()
+        batch = self.youtube.new_batch_http_request()
 
         for video in videos:
             batch.add(
-                youtube.playlistItems().insert(
+                self.youtube.playlistItems().insert(
                     part="snippet",
                     body={
                         "snippet": {
@@ -86,7 +82,7 @@ class Playlist:
                         }
                         }
                     }
-                ), callback=req_callback
+                ), callback=self.req_callback
             )
 
         batch.execute()
@@ -96,7 +92,7 @@ class Playlist:
 
     def export_videos(self):
         '''
-        
+        Returns data in format for exporting: video id is returned within full YouTube url.
         '''
         if len(self.data["Title"]) == 0:
             self.fetch_videos(self.playlist_id)
@@ -107,26 +103,31 @@ class Playlist:
 
     def get_video_ids(self):
         '''
-
+        Return list of videos IDs.
         '''
-        self.video_ids = self.data["URL"]
 
-        return self.videos_ids 
+        return self.data["URL"]
 
 
     def get_thumbnails(self):
         '''
-
+        Return list of thumbnail URLs
         '''
-        self.thumbnails = self.data["Thumbnail"]
 
-        return self.thumbnails
+        return self.data["Thumbnail"]
 
 
     def get_channels(self):
         '''
-
+        Returns list of channels. Includes duplicates.
         '''
-        self.channels = self.data["Channel"]
 
-        return self.channels 
+        return self.data["Channel"] 
+
+
+    def get_titles(self):
+        '''
+        Returns list of video titles.
+        '''
+
+        return self.data["Title"] 

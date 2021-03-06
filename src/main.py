@@ -71,6 +71,18 @@ def main():
         # export or print Watch Later playlist from local HTML file 
         return save_data(use_local_file(FLAGS=FLAGS))
     
+    if FLAGS.move:
+        print("\nAuthorize origin account.")
+        origin = Playlist(playlist_id=FLAGS.move, youtube=build_youtube(auth=True))
+        origin.fetch_videos()
+
+        print("\nAuthorize destination account.")
+        destination = Playlist(playlist_id=FLAGS.to, youtube=build_youtube(auth=True))
+        destination.fetch_videos()
+
+        # add videos to destination playlist 
+        return destination.add_videos(origin.get_video_ids())
+
     if FLAGS.public:
         # Build using only API key - no user authentication
         youtube = build_youtube(auth=False)
@@ -78,18 +90,13 @@ def main():
         # Get credentials and set up API
         youtube = build_youtube(auth=True)
 
-    if FLAGS.move:
-        origin = Playlist()
-        destination = Playlist()
-
     if FLAGS.create_playlist:
         # create new playlist 
         create_playlist(youtube, FLAGS.create_playlist, FLAGS.description)
 
     if FLAGS.export_videos:
         # get data on each video in playlist
-        playlist_id = FLAGS.export_videos.split('playlist?list=')[-1]
-        exp_playlist = Playlist(playlist_id=playlist_id, youtube=youtube)
+        exp_playlist = Playlist(playlist_id=FLAGS.export_videos, youtube=youtube)
         save_data(data=exp_playlist.export_videos())
 
 
