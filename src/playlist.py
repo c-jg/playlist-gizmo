@@ -48,16 +48,6 @@ class Playlist:
         return self.data
 
 
-    def req_callback(self, request_id, response, exception):
-        '''
-        Callback for batch request.
-        '''
-
-        if exception is None:
-            self.videos_added += 1
-            print("Success")
-
-
     def add_videos(self, videos):
         '''
         Adds YouTube video(s) to a playlist.
@@ -65,27 +55,23 @@ class Playlist:
         Args:
             videos: List of video IDs.
         '''
-        
-        batch = self.youtube.new_batch_http_request()
 
         for video in videos:
-            batch.add(
-                self.youtube.playlistItems().insert(
-                    part="snippet",
-                    body={
-                        "snippet": {
-                        "playlistId": self.playlist_id,
-                        "position": 0,
-                        "resourceId": {
-                            "kind": "youtube#video",
-                            "videoId": video
-                        }
-                        }
+            request = self.youtube.playlistItems().insert(
+                part="snippet",
+                body={
+                    "snippet": {
+                    "playlistId": self.playlist_id,
+                    "position": 0,
+                    "resourceId": {
+                        "kind": "youtube#video",
+                        "videoId": video
                     }
-                ), callback=self.req_callback
+                    }
+                }
             )
-
-        batch.execute()
+            request.execute()
+            self.videos_added += 1
         
         print(f"{self.videos_added} videos added to playlist https://www.youtube.com/playlist?list={self.playlist_id}")        
 
@@ -95,7 +81,7 @@ class Playlist:
         Returns data in format for exporting: video id is returned within full YouTube url.
         '''
         if len(self.data["Title"]) == 0:
-            self.fetch_videos(self.playlist_id)
+            self.fetch_videos()
         self.data["URL"] = [f"https://www.youtube.com/watch?v={i}" for i in self.data["URL"]]
 
         return self.data 

@@ -72,16 +72,25 @@ def main():
         return save_data(use_local_file(FLAGS=FLAGS))
     
     if FLAGS.move:
-        print("\nAuthorize origin account.")
-        origin = Playlist(playlist_id=FLAGS.move, youtube=build_youtube(auth=True))
-        origin.fetch_videos()
+        if FLAGS.move.endswith(".csv"):
+            df = pd.read_csv(FLAGS.move)
+            urls = df["URL"].str.split("=").str[1]
 
-        print("\nAuthorize destination account.")
-        destination = Playlist(playlist_id=FLAGS.to, youtube=build_youtube(auth=True))
-        destination.fetch_videos()
+            print("\nAUTHORIZE DESTINATION ACCOUNT:")
+            destination = Playlist(playlist_id=FLAGS.to, youtube=build_youtube(auth=True))
+            
+            # add videos to destination playlist
+            return destination.add_videos(urls)
+        else:
+            print("\nAUTHORIZE ORIGIN ACCOUNT:")
+            origin = Playlist(playlist_id=FLAGS.move, youtube=build_youtube(auth=True))
+            origin.fetch_videos()
 
-        # add videos to destination playlist 
-        return destination.add_videos(origin.get_video_ids())
+            print("\nAUTHORIZE DESTINATION ACCOUNT:")
+            destination = Playlist(playlist_id=FLAGS.to, youtube=build_youtube(auth=True))
+
+            # add videos to destination playlist 
+            return destination.add_videos(origin.get_video_ids())
 
     if FLAGS.public:
         # Build using only API key - no user authentication
