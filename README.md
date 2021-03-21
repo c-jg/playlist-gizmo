@@ -1,5 +1,5 @@
 # Playlist Transfer 
-## Playlist Transfer is a toll for creating, modifying, exporting, and transferring YouTube playlists.
+## Playlist Transfer is a tool for creating, modifying, exporting, and transferring YouTube playlists.
 
 <img src="https://cguer.s3.amazonaws.com/Screen+Shot+2021-03-07+at+11.04.23+PM.png">
 
@@ -22,6 +22,7 @@ Example usage to add videos from playlist on one account to another:
 python src/main.py --move <URL of playlist on Account 1> --to <URL of playlist on Account 2>
 ```
 All videos in Playlist 1 will be added to Playlist 2.
+
 
 Example usage to add videos from CSV to playlist on YouTube account:
 ```
