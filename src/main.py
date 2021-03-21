@@ -34,7 +34,7 @@ def build_youtube(auth):
     '''
     Connects to YouTube Data API.
 
-    Uses OAuth 2.0 if `auth` is set to True.
+    Uses OAuth 2.0 if auth=True
     '''
 
     scopes = ["https://www.googleapis.com/auth/youtube"]
@@ -158,12 +158,12 @@ if __name__ == '__main__':
     parser.add_argument(
         '--move',
         type=str,
-        help='Playlist ID of playlist to transfer.'
+        help='Playlist URL of playlist to transfer.'
     )
     parser.add_argument(
         '--to',
         type=str,
-        help='Playlist ID of desired destination.'
+        help='Playlist URL of desired destination.'
     )
 
     FLAGS, unparsed = parser.parse_known_args()
