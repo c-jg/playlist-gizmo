@@ -1,5 +1,5 @@
 # Playlist Transfer 
-#### Playlist Transfer is a toll for creating, modifying, exporting, and transfering YouTube playlists.
+## Playlist Transfer is a toll for creating, modifying, exporting, and transferring YouTube playlists.
 
 <img src="https://cguer.s3.amazonaws.com/Screen+Shot+2021-03-07+at+11.04.23+PM.png">
 
@@ -26,4 +26,10 @@ All videos in Playlist 1 will be added to Playlist 2.
 Example usage to add videos from CSV to playlist on YouTube account:
 ```
 python src/main.py --move my_old_playlist_videos.csv --to <URL of new playlist>
+```
+## Additional
+### Export Watch Later Playlist
+* Watch Later playlists can be exported by saving the page HTML and running the following command:
+```
+python src/main.py --local_wl <path to HTML file>
 ```
