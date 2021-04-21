@@ -1,7 +1,7 @@
 # Playlist Transfer 
 ## Playlist Transfer is a tool for creating, modifying, exporting, and transferring YouTube playlists.
 
-<img src="https://cguer.s3.amazonaws.com/Screen+Shot+2021-03-07+at+11.04.23+PM.png">
+![](Screen%20Shot%202021-03-07%20at%2011.04.23%20PM.png)
 
 ## Setup
 1. Install dependencies
