@@ -30,7 +30,7 @@ python src/main.py --move my_old_playlist_videos.csv --to <URL of new playlist>
 ```
 ## Additional
 ### Export Watch Later Playlist
-* Watch Later playlists can be exported by saving the page HTML and running the following command:
+* Watch Later playlists can be exported by saving the HTML page and running the following command:
 ```
 python src/main.py --local_wl <path to HTML file>
 ```
