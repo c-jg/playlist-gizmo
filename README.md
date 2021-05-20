@@ -28,6 +28,13 @@ Example usage to add videos from CSV to playlist on YouTube account:
 ```
 python src/main.py --move my_old_playlist_videos.csv --to <URL of new playlist>
 ```
+
+Creating an empty playlist can be done by running the command:
+```
+python src/main.py --create_playlist <NAME OF PLAYLIST>
+```
+The optional `--description` flag can be used to add a description to the playlist.
+
 ## Additional
 ### Export Watch Later Playlist
 * Watch Later playlists can be exported by saving the HTML page and running the following command:

@@ -56,7 +56,7 @@ class Playlist:
             videos: List of video IDs.
         '''
 
-        for video in videos:
+        for video in videos[::-1]:
             request = self.youtube.playlistItems().insert(
                 part="snippet",
                 body={
