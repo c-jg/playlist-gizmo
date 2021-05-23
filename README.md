@@ -1,5 +1,5 @@
-# Playlist Transfer 
-## Playlist Transfer is a tool for creating, modifying, exporting, and transferring YouTube playlists.
+# Playlist Gizmo 
+## Playlist Gizmo is a tool for creating, modifying, exporting, and transferring YouTube playlists.
 
 ![](Screen%20Shot%202021-03-07%20at%2011.04.23%20PM.png)
 
